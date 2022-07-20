@@ -2,15 +2,14 @@
  * Get orderId from URL :
  */
 const orderId = new URLSearchParams(window.location.search).get("id");
-console.log("Id de confirmation de la commande :" + orderId);
 
-// ---------------------------------------------------------------
+// ------------------------------------------------------------------------
 /**
  * Display orderId :
  */
 document.getElementById("orderId").textContent = orderId;
 
-// ------------------------------------------------------------------
+// ------------------------------------------------------------------------
 /**
  * Create a "thank-you" message :
  */
@@ -23,7 +22,7 @@ document.querySelector(".confirmation").style.flexDirection = `column`;
 document.querySelector(".confirmation").style.textAlign = `center`;
 document.querySelector(".confirmation").style.fontSize = `18px`;
 
-// ---------------------------------------------------------------
+// -----------------------------------------------------------------------
 /**
  * Clear local storage :
  */

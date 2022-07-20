@@ -3,24 +3,19 @@
  */
 const params = new URLSearchParams(window.location.search);
 const productId = params.get("id");
-console.log("Id du produit de la page :" + productId);
 
-// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 const buttonAddToCart = document.getElementById("addToCart");
-console.log(buttonAddToCart);
 
 const selectedColor = document.getElementById("colors");
-console.log(selectedColor);
 
 const selectedQuantity = document.getElementById("quantity");
-console.log(selectedQuantity);
 
 const selectedName = document.getElementById("title");
-console.log(selectedName);
 
-// --------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 /**
- * Create variables for messages we will create for addToCart button :
+ * Declare variables for messages when click event on button addToCart :
  */
 let chooseColor;
 
@@ -28,7 +23,7 @@ let chooseQuantity;
 
 let productSentIntoBasket;
 
-// -----------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 /**
  * Send request to API to get data, and create a card for the product :
  * @param {string} id
@@ -37,8 +32,6 @@ function getProductById(id) {
   fetch(`http://localhost:3000/api/products/` + id)
     .then((res) => res.json())
     .then((data) => {
-      console.log("Données du produit : " + JSON.stringify(data));
-      console.log(data);
       makeProductCard(
         data.imageUrl,
         data.altTxt,
@@ -53,7 +46,7 @@ function getProductById(id) {
 
 getProductById(productId);
 
-// -----------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 /**
  * Create an Error Message :
  */
@@ -73,7 +66,7 @@ function errorMessage(errorMessage) {
   errorRequestMsg.style.textAlign = `center`;
 }
 
-// --------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 /**
  * Create a card for product :
  * @param {string} image
@@ -149,14 +142,12 @@ function makeProductCard(image, alt, title, price, description, colors) {
   chooseQuantity.style.padding = `2px`;
   chooseQuantity.style.visibility = `hidden`;
 
-  // Create "div" to display message when product sent into basket :
+  // Create "div" to display message when product is sent into basket :
   productSentIntoBasket = document.createElement("span");
 
   document.querySelector(".item__content").appendChild(productSentIntoBasket);
 
   productSentIntoBasket.innerText = "Le produit a bien été ajouté au panier";
-
-  productSentIntoBasket.id = "putIntoBasket";
 
   productSentIntoBasket.style.fontSize = `20px`;
   productSentIntoBasket.style.fontWeight = 500;
@@ -167,32 +158,24 @@ function makeProductCard(image, alt, title, price, description, colors) {
   productSentIntoBasket.style.visibility = `hidden`;
 }
 
-// ------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
 /**
  * Listen to click event on button #addToCart :
  */
 buttonAddToCart.addEventListener("click", (e) => {
-  console.log(e);
-
   const selectedProduct = {
     id: productId,
     title: selectedName.innerText,
     color: selectedColor.value,
-    quantity: selectedQuantity.value,
+    quantity: Math.floor(selectedQuantity.value),
   };
-  console.log("Produit sélectionné : " + JSON.stringify(selectedProduct));
 
-  // Create an array for the local Storage :
   let localStorageArray = JSON.parse(localStorage.getItem("products"));
-  console.log(
-    "Tableau du local storage : " + JSON.stringify(localStorageArray)
-  );
 
-  // Check if color and quantity are selected
-  // and display message(s) if missing :
+  // Check if color and quantity are selected, and display message(s) if false :
   if (
     selectedColor.value == false ||
-    selectedQuantity.value == 0 ||
+    selectedQuantity.value < 1 ||
     selectedQuantity.value > 100
   ) {
     if (selectedColor.value == false) {
@@ -200,62 +183,58 @@ buttonAddToCart.addEventListener("click", (e) => {
     } else {
       chooseColor.style.visibility = `hidden`;
     }
-    if (selectedQuantity.value == 0 || selectedQuantity.value > 100) {
+    if (selectedQuantity.value < 1 || selectedQuantity.value > 100) {
       chooseQuantity.style.visibility = `visible`;
     } else {
       chooseQuantity.style.visibility = `hidden`;
     }
   }
-  // When color and quantity selected are true,
-  // if local storage doesn't exist, we create an array ...
+  // When selected color and quantity are true,
+  // if local storage is empty, we create an array ...
   // ... and we push the selected product into that array :
   else {
     if (localStorageArray == null) {
       localStorageArray = [];
       localStorageArray.push(selectedProduct);
     }
-    // If local storage exists ...
-    // ... we verify if it contains id and color of selected product.
-    // If local storage contains id and color of selected product ...
-    // ... we adjust quantity :
+    // If local storage contains at least one product ...
+    // ... we verify if it contains product with same id and color as selected product :
     else {
       let foundProduct = localStorageArray.find(
         (item) =>
           item.id == selectedProduct.id && item.color == selectedProduct.color
       );
+      // If true, we adjust quantity :
       if (foundProduct) {
-        console.log(foundProduct);
         foundProduct.quantity =
           parseInt(foundProduct.quantity) + parseInt(selectedProduct.quantity);
+        if (foundProduct.quantity > 100) foundProduct.quantity = 100;
       }
 
-      // If local storage doesn't contain id and color of selected product ...
-      // ... we push the selected product into the localStorageArray :
+      // If false, we push the selected product into the localStorageArray :
       else {
         localStorageArray.push(selectedProduct);
       }
     }
-    // We put the localStorageArray into the local storage :
+    // We set the localStorageArray into the local storage :
     localStorage.setItem("products", JSON.stringify(localStorageArray));
 
     chooseColor.style.visibility = `hidden`;
     chooseQuantity.style.visibility = `hidden`;
 
     productSentIntoBasket.style.visibility = `visible`;
-    // This message will disappear after 4 seconds :
+    // This message will disappear after 3 seconds :
     setTimeout(function () {
-      document.getElementById("putIntoBasket").style.visibility = "hidden";
+      productSentIntoBasket.style.visibility = "hidden";
     }, 3000);
 
     // Set back the original options values :
     let colors = document.getElementById("colors");
-    console.log(colors);
     colors.value = "";
 
     let quantity = document.querySelector(
       ".item__content__settings__quantity input"
     );
-    console.log(quantity);
     quantity.value = 0;
   }
 });
