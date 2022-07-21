@@ -346,9 +346,9 @@ let regExpAddress = /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿ
 
 /**
  * RegExp email :
- * https://askcodez.com/rails-regex-pour-la-validation-des-emails.html
+ * https://www.jochentopf.com/email/chars.html
  */
-let regExpEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+let regExpEmail = /^[A-Z0-9.+-_]+@[A-Z0-9]+\.[A-Z]{2,4}$/i;
 
 // ------------------------------------------------------------------------------------------
 /**
