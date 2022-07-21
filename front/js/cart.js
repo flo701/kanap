@@ -405,14 +405,6 @@ okForm.style.fontWeight = `500`;
 okForm.style.marginTop = `-50px`;
 okForm.style.visibility = `hidden`;
 
-/**
- * Create an array with the ids of items in basket :
- */
-let products = [];
-for (item of basket) {
-  products.push(item.id);
-}
-
 //------------------------------------------------------------------------------------------
 /**
  * Listen to events on first name, last name and city inputs :
@@ -557,6 +549,12 @@ buttonOrder.addEventListener("click", (event) => {
     city,
     email,
   };
+
+  // Create an array with the ids of items in basket :
+  let products = [];
+  for (item of basket) {
+    products.push(item.id);
+  }
 
   // If there is at least one product in basket and contact is true, set contact in local storage :
   if (basket.length > 0 && firstName && lastName && address && city && email) {
