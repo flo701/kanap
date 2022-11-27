@@ -1,4 +1,4 @@
-![logo kanap](front/images/logo.png)
+![logo kanap](front/images/logo2.png)
 
 # Kanap #
 
