@@ -1,12 +1,9 @@
-// --------------------------------------------------------------------------
 let basket = JSON.parse(localStorage.getItem("products"));
-console.log("Panier : " + JSON.stringify(basket));
-console.log(localStorage);
 
 // Array with data and prices of products in basket :
 let arrayOfDataAndPricesOfArticles = [];
 
-// Declare variables we will be using to display total quantity and price :
+// Variables we will be using to display total quantity and total price :
 const displayTotalQuantity = document.getElementById("totalQuantity");
 const displayTotalPrice = document.getElementById("totalPrice");
 
@@ -15,21 +12,20 @@ if (basket === null || basket.length <= 0 || localStorage.length < 1) {
   document.querySelector("h1").textContent = "Votre panier est vide";
 }
 
-//-------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
 /**
- * Send request to API to get products data :
+ * Send request to API to get product data :
  */
 for (let item of basket) {
   fetch(`http://localhost:3000/api/products/${item.id}`)
     .then((res) => res.json())
     .then((data) => {
-      console.log(data);
       displayProductOfBasket(item, data);
     })
     .catch((error) => errorMessage(error));
 }
 
-// -----------------------------------------------------------------
+// ------------------------------------------------------------------------------------------
 /**
  * Create an error message :
  */
@@ -50,7 +46,7 @@ function errorMessage(errorMessage) {
   errorRequestMsg.style.padding = `5px`;
 }
 
-// ---------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
 /**
  * Display product of basket :
  * @param {string} item
@@ -114,7 +110,7 @@ function displayProductOfBasket(item, data) {
   inputQuantity.setAttribute("value", item.quantity);
   cartItemContentSettingsQuantity.appendChild(inputQuantity);
 
-  dataOfArticle = {
+  let dataOfArticle = {
     id: item.id,
     title: data.name,
     price: data.price,
@@ -122,15 +118,8 @@ function displayProductOfBasket(item, data) {
     quantity: item.quantity,
     totalPricePerArticle: data.price * inputQuantity.value,
   };
-  console.log(
-    "Données du produit ajouté au panier :" + JSON.stringify(dataOfArticle)
-  );
 
   arrayOfDataAndPricesOfArticles.push(dataOfArticle);
-  console.log(
-    "Tableau avec données et prix par article : " +
-      JSON.stringify(arrayOfDataAndPricesOfArticles)
-  );
 
   const pricePerArticle = document.createElement("div");
   pricePerArticle.className = "pricePerArticle";
@@ -161,7 +150,7 @@ function displayProductOfBasket(item, data) {
   displayTotalPrice.textContent = getTotalPrice(arrayOfDataAndPricesOfArticles);
 }
 
-// --------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
 /**
  *Get total quantity of products in basket :
  */
@@ -172,32 +161,28 @@ function getTotalQuantity() {
     totalQuantity += parseInt(product.quantity, 10);
   }
 
-  console.log("Quantité totale d'articles : " + totalQuantity);
-
   displayTotalQuantity.textContent = totalQuantity;
 
   return totalQuantity;
 }
 
-// --------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------
 /**
  * Get total price of products in basket :
  */
 function getTotalPrice(array) {
-  sum = 0;
+  let sum = 0;
 
   for (let i = 0; i < array.length; i++) {
     sum += array[i].totalPricePerArticle;
   }
-
-  console.log("Prix total du panier : " + sum);
 
   displayTotalPrice.textContent = sum;
 
   return sum;
 }
 
-// ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------
 // Create a message for each product removed from basket :
 const removeMessage = document.createElement("div");
 
@@ -207,51 +192,44 @@ document.querySelector(".cart__price").style.flexDirection = `column`;
 
 removeMessage.innerText = "Un produit a été supprimé";
 
-removeMessage.id = "removeItem";
-
 removeMessage.style.textAlign = `center`;
 removeMessage.style.fontSize = `20px`;
 removeMessage.style.fontWeight = `500`;
 removeMessage.style.visibility = `hidden`;
 
 /**
- * Remove product from local storage :
+ * Remove product from basket :
  */
 function removeProduct(click) {
   let targetProduct = click.target.closest("article");
 
-  //We keep in the basket all products but the target product :
+  //We keep in the basket all the products except the target product :
   basket = basket.filter(
     (item) =>
       item._id !== targetProduct.dataset.id &&
       item.color !== targetProduct.dataset.color
   );
   localStorage.setItem("products", JSON.stringify(basket));
-  console.log("Panier : " + JSON.stringify(basket));
 
   targetProduct.remove();
 
   removeMessage.style.visibility = "visible";
-
+  // This message will disappear after 6 seconds :
   setTimeout(function () {
-    document.getElementById("removeItem").style.visibility = "hidden";
+    removeMessage.style.visibility = "hidden";
   }, 6000);
 
-  // We keep in the array of data all data but thoses of target product :
+  // We keep in the array all the data except those of the target product :
   arrayOfDataAndPricesOfArticles = arrayOfDataAndPricesOfArticles.filter(
     (item) =>
       item._id !== targetProduct.dataset.id &&
       item.color !== targetProduct.dataset.color
   );
-  console.log(
-    "Tableau avec données et prix par article :" +
-      JSON.stringify(arrayOfDataAndPricesOfArticles)
-  );
 
-  // Calculate new quantity of basket :
+  // Calculate new total quantity of products in basket :
   getTotalQuantity();
 
-  // Calculate new price of basket :
+  // Calculate new total price of basket :
   getTotalPrice(arrayOfDataAndPricesOfArticles);
 
   // If basket is empty, modify h1 :
@@ -260,7 +238,7 @@ function removeProduct(click) {
   }
 }
 
-// --------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------
 /**
  * Modify product quantity :
  */
@@ -269,10 +247,6 @@ function changeQuantityProduct(change) {
   let quantityProduct = change.target.closest(".itemQuantity");
   let pricePerArticle = targetProduct.querySelector(".pricePerArticle");
 
-  console.log(targetProduct);
-  console.log(quantityProduct);
-  console.log(pricePerArticle);
-
   // We search product in local storage with same id and color...
   // ... and we modify the quantity :
   let foundProduct = basket.find(
@@ -280,11 +254,6 @@ function changeQuantityProduct(change) {
       product.id == targetProduct.dataset.id &&
       product.color == targetProduct.dataset.color
   );
-  console.log(
-    "Produit avec même id et même couleur trouvé dans le local storage : " +
-      JSON.stringify(foundProduct)
-  );
-
   foundProduct.quantity = parseInt(quantityProduct.value, 10);
 
   // Set 1 as minimum quantity, and 100 as maximun quantity :
@@ -296,46 +265,18 @@ function changeQuantityProduct(change) {
     quantityProduct.value = 100;
   }
 
-  console.log("Nouvelle quantité : " + foundProduct.quantity);
-
-  // Get data of foundProduct in the array containing the data of products in basket,
-  // and get the price of foundProduct :
+  // Search the price of foundProduct in the array
+  // (that contains all the data of products in basket) :
   let foundProductData = arrayOfDataAndPricesOfArticles.find(
     (product) =>
       product.id == foundProduct.id && product.color == foundProduct.color
   );
-  console.log(
-    "Données du produit dont la quantité est modifiée : " +
-      JSON.stringify(foundProductData)
-  );
-
   let foundProductPrice = foundProductData.price;
 
-  // Calculate new price per article :
+  // Calculate and display new price per article :
   let pricePerFoundProduct = foundProductPrice * foundProduct.quantity;
-  console.log(pricePerFoundProduct);
-
   pricePerArticle.textContent =
     "Prix total pour cet article : " + pricePerFoundProduct + " €";
-
-  // Console.log :
-  console.log(
-    "Tableau avec prix des articles du panier : " +
-      JSON.stringify(arrayOfDataAndPricesOfArticles)
-  );
-  console.log("Id du produit dont on change la quantité : " + foundProduct.id);
-  console.log(
-    "Couleur du produit dont on change la quantité : " + foundProduct.color
-  );
-  console.log(
-    "Prix du produit dont on change la quantité : " +
-      JSON.stringify(foundProductPrice)
-  );
-  console.log("Nouvelle quantité : " + foundProduct.quantity);
-  console.log(
-    "Nouveau prix par article pour le produit dont on change la quantité : " +
-      JSON.stringify(pricePerFoundProduct)
-  );
 
   // Change quantity and total price per article (for foundProduct) in the array of data :
   arrayOfDataAndPricesOfArticles.forEach((object) => {
@@ -344,10 +285,6 @@ function changeQuantityProduct(change) {
         (object.quantity = foundProduct.quantity);
     }
   });
-  console.log(
-    "Tableau avec prix des articles du panier : " +
-      JSON.stringify(arrayOfDataAndPricesOfArticles)
-  );
 
   // Calculate and display the new total quantity of articles :
   totalQuantity = getTotalQuantity();
@@ -355,41 +292,31 @@ function changeQuantityProduct(change) {
 
   // Update the local storage :
   localStorage.setItem("products", JSON.stringify(basket));
-  console.log("Panier: " + JSON.stringify(basket));
 
-  // Calculate and display the new price of basket :
+  // Calculate and display the new total price of basket :
   getTotalPrice(arrayOfDataAndPricesOfArticles);
 }
 
-// ****************************************************************************
-// ******************************* FORM ***************************************
-// ****************************************************************************
+// *****************************************************************************************
+// ******************************* FORM ****************************************************
+// *****************************************************************************************
 
-/**
- * Get form inputs elements :
- */
 const firstNameInput = document.querySelector("#firstName");
-console.log(firstNameInput);
 const lastNameInput = document.querySelector("#lastName");
-console.log(lastNameInput);
 const addressInput = document.querySelector("#address");
-console.log(addressInput);
 const cityInput = document.querySelector("#city");
-console.log(cityInput);
 const emailInput = document.querySelector("#email");
-console.log(emailInput);
 
 const buttonOrder = document.querySelector("#order");
-console.log(buttonOrder);
 
 /**
- * Create variables for inputs values, and orderId :
+ * Declare variables for inputs values, and orderId :
  */
 let firstName, lastName, address, city, email;
 
 let orderId;
 
-// ------------------------------ RegExp ------------------------------------------
+// ------------------------------ RegExp ---------------------------------------------------
 /**
  * RegExp names and city.
  * Validate a name with :
@@ -419,13 +346,13 @@ let regExpAddress = /^[a-záàâäãåçéèêëíìîïñóòôöõúùûüýÿ
 
 /**
  * RegExp email :
- * https://askcodez.com/rails-regex-pour-la-validation-des-emails.html
+ * https://www.jochentopf.com/email/chars.html
  */
-let regExpEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+let regExpEmail = /^[A-Z0-9.+-_]+@[A-Z0-9]+\.[A-Z]{2,4}$/i;
 
-// ------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------
 /**
- * Create error message if invalid form data :
+ * Create an error message if invalid form data :
  */
 const errorForm = document.createElement("div");
 
@@ -478,33 +405,17 @@ okForm.style.fontWeight = `500`;
 okForm.style.marginTop = `-50px`;
 okForm.style.visibility = `hidden`;
 
-/**
- * Create an array with the ids of items in basket :
- */
-let products = [];
-for (item of basket) {
-  products.push(item.id);
-}
-console.log(
-  "Tableau d'Ids à envoyer au back-end : " + JSON.stringify(products)
-);
-
-//-----------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
 /**
  * Listen to events on first name, last name and city inputs :
  */
 firstNameInput.addEventListener("input", (event) => {
-  console.log(event);
-
   if (event.target.value.match(regExpNamesAndCity)) {
     firstName = event.target.value;
     firstNameInput.style.backgroundColor = "white";
 
     const firstNameErrorMsg = document.querySelector("#firstNameErrorMsg");
-
     firstNameErrorMsg.textContent = "";
-
-    console.log("Prénom : " + firstName);
     return firstName;
   } else {
     firstName = null;
@@ -518,23 +429,17 @@ firstNameInput.addEventListener("input", (event) => {
 
     firstNameErrorMsg.textContent = "Prénom invalide";
 
-    console.log("Prénom :" + firstName);
     return false;
   }
 });
 
 lastNameInput.addEventListener("input", (event) => {
-  console.log(event);
-
   if (event.target.value.match(regExpNamesAndCity)) {
     lastName = event.target.value;
     lastNameInput.style.backgroundColor = "white";
 
     const lastNameErrorMsg = document.querySelector("#lastNameErrorMsg");
-
     lastNameErrorMsg.textContent = "";
-
-    console.log("Nom : " + lastName);
     return lastName;
   } else {
     lastName = null;
@@ -548,23 +453,17 @@ lastNameInput.addEventListener("input", (event) => {
 
     lastNameErrorMsg.textContent = "Nom invalide";
 
-    console.log("Nom :" + lastName);
     return false;
   }
 });
 
 cityInput.addEventListener("input", (event) => {
-  console.log(event);
-
   if (event.target.value.match(regExpNamesAndCity)) {
     city = event.target.value;
     cityInput.style.backgroundColor = "white";
 
     const cityErrorMsg = document.querySelector("#cityErrorMsg");
-
     cityErrorMsg.textContent = "";
-
-    console.log("Ville : " + city);
     return city;
   } else {
     city = null;
@@ -578,7 +477,6 @@ cityInput.addEventListener("input", (event) => {
 
     cityErrorMsg.textContent = "Nom de ville invalide";
 
-    console.log("Ville : " + city);
     return false;
   }
 });
@@ -587,16 +485,12 @@ cityInput.addEventListener("input", (event) => {
  * Listen to event on address input :
  */
 addressInput.addEventListener("input", (event) => {
-  console.log(event);
-
   if (event.target.value.match(regExpAddress)) {
     address = event.target.value;
     addressInput.style.backgroundColor = "white";
 
     const addressErrorMsg = document.querySelector("#addressErrorMsg");
-
     addressErrorMsg.textContent = "";
-    console.log("Adresse : " + address);
     return address;
   } else {
     address = null;
@@ -610,7 +504,6 @@ addressInput.addEventListener("input", (event) => {
 
     addressErrorMsg.textContent = "Adresse invalide";
 
-    console.log("Addresse : " + address);
     return false;
   }
 });
@@ -619,17 +512,12 @@ addressInput.addEventListener("input", (event) => {
  * Listen to event on email input :
  */
 emailInput.addEventListener("input", (event) => {
-  console.log(event);
-
   if (event.target.value.match(regExpEmail)) {
     email = event.target.value;
     emailInput.style.backgroundColor = "white";
 
     const emailErrorMsg = document.querySelector("#emailErrorMsg");
-
     emailErrorMsg.textContent = "";
-
-    console.log("Email : " + email);
     return email;
   } else {
     email = null;
@@ -643,17 +531,15 @@ emailInput.addEventListener("input", (event) => {
 
     emailErrorMsg.textContent = "Email invalide";
 
-    console.log("Email : " + email);
     return false;
   }
 });
 
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------
 /**
  * Listen to click event on buttonOrder :
  */
 buttonOrder.addEventListener("click", (event) => {
-  console.log(event);
   event.preventDefault();
 
   let contact = {
@@ -663,17 +549,21 @@ buttonOrder.addEventListener("click", (event) => {
     city,
     email,
   };
-  console.log(contact);
 
+  // Create an array with the ids of items in basket :
+  let products = [];
+  for (item of basket) {
+    products.push(item.id);
+  }
+
+  // If there is at least one product in basket and contact is true, set contact in local storage :
   if (basket.length > 0 && firstName && lastName && address && city && email) {
     localStorage.setItem("contact", JSON.stringify(contact));
 
     okForm.style.visibility = `visible`;
     errorForm.style.visibility = `hidden`;
 
-    console.log(products);
-
-    // Send object contact and array of products-id to server,
+    // Send contact and products to server,
     // get orderId,
     // and redirect to confirmation page :
     fetch("http://localhost:3000/api/products/order", {
@@ -683,10 +573,9 @@ buttonOrder.addEventListener("click", (event) => {
       },
       body: JSON.stringify({ contact, products }),
     })
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((server) => {
         orderId = server.orderId;
-        console.log(orderId);
         if (orderId != "") {
           location.href = "confirmation.html?id=" + orderId;
         }
@@ -700,18 +589,15 @@ buttonOrder.addEventListener("click", (event) => {
     city &&
     email
   ) {
-    event.preventDefault();
-    console.log("Panier vide");
     errorForm.style.visibility = `hidden`;
     emptyBasket.style.visibility = `visible`;
   } else {
-    console.log("Données formulaire invalides");
     okForm.style.visibility = `hidden`;
     errorForm.style.visibility = `visible`;
   }
 });
 
-// -----------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------
 /**
  * Create an Error Message :
  */

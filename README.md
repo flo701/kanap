@@ -3,7 +3,7 @@
 - Projet 5 du parcours "Développeur Web" d'OpenClassrooms :
 - "Construisez un site e-commerce en JavaScript".
 
-- Nous avions, pour base de travail, le code du back-end et la partie statique du front-end. Vous trouverez le repo initial [ici](https://github.com/OpenClassrooms-Student-Center/P5-Dev-Web-Kanap) 
+- Nous avions, pour base de travail, le code du back-end et la partie statique du front-end. Vous trouverez le repo initial [ici](https://github.com/OpenClassrooms-Student-Center/P5-Dev-Web-Kanap). 
 - Nous devions unifier les travaux déjà réalisés par l'équipe en intégrant dynamiquement les éléments de l'API dans les différentes pages web avec JavaScript. 
 - L'utilisation de tout framework ou librairie JavaScript était interdite pour ce projet. Seul le code JavaScript pur était autorisé.
 - Nous devions également mettre en place un plan de test d'acceptation.

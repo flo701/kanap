@@ -1,12 +1,11 @@
 /**
- * Send request to API to get data of all products
- * Create card for each item, with the data :
+ * Send request to API to get data of all products.
+ * With the data, create card for each item :
  */
-function getAllProducts() {
+ function getAllProducts() {
   fetch("http://localhost:3000/api/products")
     .then((res) => res.json())
     .then((res) => {
-      console.log(res);
       for (const item of res) {
         makeCard(
           item._id,
