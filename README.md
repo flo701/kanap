@@ -78,11 +78,16 @@ correspondantes indiquées à chaque fois.
 - Nous devions planifier une suite de tests d’acceptation pour couvrir l’ensemble des fonctionnalités listées
 dans ce document (spécifications fonctionnelles et techniques Kanap).
 
-## Lancer le projet (traduction des consignes du [repo initial](https://github.com/OpenClassrooms-Student-Center/P5-Dev-Web-Kanap))
+## Lancer le projet 
+### Démarrer le back-end :
 - Vous devez avoir Node et `npm` installés localement sur votre machine.
 - Clonez ce repo ; 
-- Dans le terminal, placez-vous dans le dossier "back", puis tapez `npm install`; 
+- Dans le terminal de votre éditeur de code, placez-vous dans le dossier "back", puis tapez `npm install`; 
 - Ensuite, tapez `node server`. 
-- Le serveur devrait se lancer dans votre navigateur sur le port `3000`. Si le serveur tourne sur un autre port, la console vous indiquera par exemple `Listening on port 3001`.
+- Le serveur devrait se lancer dans votre navigateur sur le port `3000`. Si le serveur tourne sur un autre port, le terminal vous indiquera par exemple `Listening on port 3001`.
+
+### Afficher la page du site kanap sur votre navigateur :
+- Si vous êtes sur VSCode, installez l'extension live server, puis cliquez sur Go Live (en bas à droite de votre écran).
+- Sinon, dans le dossier kanap, ouvrez le dossier front, puis le dossier html. Sur index.html, faites un clic droit et cliquez sur ouvrir.
 
 
