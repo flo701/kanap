@@ -25,4 +25,3 @@ disk: 2048
 web:
   commands: 
     start: "node index.js"
-    
